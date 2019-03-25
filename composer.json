@@ -1,0 +1,34 @@
+{
+  "name": "phpth/ipc",
+  "description": "进程通信相关组件",
+  "version": "v1.2.0",
+  "authors": [
+    {
+      "name": "zhangjs",
+      "email": "843960877@qq.com"
+    }
+  ],
+  "type": "package",
+  "homepage": "https://github.com/phpth/ipc",
+  "license": "Apache-2.0",
+  "minimum-stability": "stable",
+  "require": {
+    "php":"^7.1",
+    "ext-shmop":">7.1",
+    "phpth/linux-code": ">=1.0"
+  },
+  "suggest": {
+    "cli": "*"
+  },
+  "keywords": [
+    "ipc",
+    "ipc Queue",
+    "share memory",
+    "file map memory"
+  ],
+  "autoload": {
+    "classmap": [
+      "src/"
+    ]
+  }
+}
