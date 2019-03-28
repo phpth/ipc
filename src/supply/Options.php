@@ -56,6 +56,12 @@ class Options
     public $file;
 
     /**
+     *
+     * @var string
+     */
+    public $after_format_path = '';
+
+    /**
      * 文件相对路径
      * @var string
      */
@@ -65,7 +71,7 @@ class Options
      * 文件跟路径
      * @var string
      */
-    public $file_root_path = '/dev/shm/';
+    public $file_root_path = 'c:/shm/';
 
     /**
      * 读取文件每次读取大小

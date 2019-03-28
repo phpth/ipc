@@ -16,6 +16,7 @@ namespace phpth\ipc;
 
 use Exception;
 use phpth\ipc\exception\IpcException;
+use phpth\ipc\supply\Options;
 use phpth\ipc\supply\Store;
 
 class FileMap extends Store
@@ -234,7 +235,7 @@ class FileMap extends Store
         $data = $this->options->serialize_handle->serialize($data);
         $len = strlen($data);
         //检测空间容量
-        $need_space = $len - disk_free_space($this->options->file) ;
+        $need_space = $len - disk_free_space($this->options->after_format_path);
         if($need_space > 0)
         {
             $data = "磁盘空间不足，还需：{$need_space} Bytes";

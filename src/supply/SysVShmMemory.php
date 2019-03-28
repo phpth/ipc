@@ -33,7 +33,10 @@ class sysVShmMemory extends Store
      */
     protected function init()
     {
-        // noop
+        if(!is_resource ($this->options->share_memory))
+        {
+            throw new IpcException("请设置合法的共享内存资源");
+        }
     }
 
     /**

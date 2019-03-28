@@ -57,10 +57,6 @@ abstract class Store
         {
             throw new ExecutableException("请设置序列化对象");
         }
-        if(!is_resource ($this->options->share_memory))
-        {
-            throw new IpcException("请设置合法的共享内存资源");
-        }
         if(empty($this->options->file_path))
         {
             $this->options->file_path = Store::DEFAULT_FILE_PATH;
@@ -69,6 +65,7 @@ abstract class Store
         {
             $this->options->file = Store::filePathFormat($this->options->file_path, $this->options->file_root_path);
         }
+        $this->options->after_format_path = dirname ( $this->options->file);
         $this->lock_file_handle = fopen($this->options->file, $this->options->file_open_flag) ;
     }
 
