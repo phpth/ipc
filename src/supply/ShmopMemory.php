@@ -51,8 +51,8 @@ class ShmopMemory extends Store
     /**
      *
      * @param bool $key
-     * @return array|bool|mixed|string|null
-     * @throws Throwable
+     * @return mixed
+     * @throws IpcException
      */
     public function get ( $key = true )
     {
@@ -81,7 +81,7 @@ class ShmopMemory extends Store
         catch (Throwable $e)
         {
             restore_error_handler ();
-            throw $e ;
+            throw new IpcException($e->getMessage (), 0, $e) ;
         }
     }
 
@@ -127,7 +127,7 @@ class ShmopMemory extends Store
      *
      * @param bool $key
      * @return bool|int
-     * @throws \Throwable
+     * @throws IpcException
      */
     public function unset($key=true)
     {
@@ -175,7 +175,7 @@ class ShmopMemory extends Store
         catch ( Throwable $e ) {
             $this->unlock ();
             restore_error_handler ();
-            throw $e;
+            throw new IpcException($e->getMessage (), 0, $e);
         }
     }
 
@@ -212,13 +212,13 @@ class ShmopMemory extends Store
     }
 
     /**
-     * @return array|bool|mixed|string
+     * @return array
      */
     protected function read()
     {
         $data_len = (int) trim ( shmop_read ( $this ->options->share_memory , 0 , ShmopMemory::LEN_MARK ) );
         $data    = trim ( shmop_read ( $this -> options->share_memory , ShmopMemory::LEN_MARK , $data_len ) );
-        $data    = $this->options->serialize_handle->unSerialize ( $data );
+        $data    = $this->options->serialize->decode ( $data );
         if ( empty( $data ) ) return [];
         return (array) $data;
     }
@@ -231,7 +231,7 @@ class ShmopMemory extends Store
      */
     protected function write($data)
     {
-        $data = $this->options->serialize_handle->serialize($data);
+        $data = $this->options->serialize->encode($data);
         $data_len = strlen ( $data);
         if($data_len > $this->options->memory_size-ShmopMemory::LEN_MARK)
         {

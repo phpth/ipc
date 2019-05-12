@@ -1,7 +1,7 @@
 {
   "name": "phpth/ipc",
   "description": "进程通信相关组件",
-  "version": "v1.2.0",
+  "version": "1.3.0",
   "authors": [
     {
       "name": "zhangjs",
@@ -18,7 +18,7 @@
     "phpth/linux-code": ">=1.0"
   },
   "suggest": {
-    "cli": "*"
+    "ext-sysvShm": "*"
   },
   "keywords": [
     "ipc",

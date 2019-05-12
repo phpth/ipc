@@ -12,20 +12,18 @@
 // +----------------------------------------------------------------------
 // | Time: 下午 23:01
 // +----------------------------------------------------------------------
-namespace phpth\ipc;
+namespace phpth\ipc\supply;
 
-use Exception;
+use Throwable;
 use phpth\ipc\exception\IpcException;
-use phpth\ipc\supply\Options;
-use phpth\ipc\supply\Store;
 
 class FileMap extends Store
 {
     /**
      * 新增值
      * @param $value
-     * @return array|bool|int|mixed|string
-     * @throws Exception
+     * @return bool
+     * @throws IpcException
      */
     public function add($value)
     {
@@ -46,22 +44,18 @@ class FileMap extends Store
                 goto unlock ;
             }
             $data[] = $value;
-            $data = $this->write($data);
-            if($data )
-            {
-                throw new IpcException($data);
-            }
+            $res = $this->write($data);
             unlock:
             $this->unlock();
             end:
             restore_error_handler();
             return $res;
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             $this->unlock();
             restore_error_handler();
-            throw $e;
+            throw new IpcException($e->getMessage (), 0, $e);
         }
     }
 
@@ -69,8 +63,8 @@ class FileMap extends Store
      * 设置值
      * @param $key string 使用"." 来指定写入维度 如：set('a.b.c','c') 即 data['a']['b']['c'] = 'c'
      * @param $value
-     * @return bool|int|mixed|string
-     * @throws Exception
+     * @return bool
+     * @throws IpcException
      */
     public function set ($key, $value)
     {
@@ -87,7 +81,7 @@ class FileMap extends Store
             $data = $this->read() ;
             if($data === false)
             {
-                throw new Exception($data);
+                goto unlock;
             }
             $tmp = &$data ;
             foreach($key  as $k)
@@ -103,12 +97,7 @@ class FileMap extends Store
                 }
             }
             $tmp = $value;
-            $data = $this->write($data);
-            if($data )
-            {
-                throw new Exception($data);
-            }
-            $res = true ;
+            $res = $this->write($data);
             unlock:
             $this->unlock();
             end :
@@ -126,8 +115,8 @@ class FileMap extends Store
     /**
      * 获取值
      * @param $key mixed  为 true 则获取所有
-     * @return bool|mixed|null|string
-     * @throws Exception
+     * @return array|string|bool
+     * @throws IpcException
      */
     public function get ($key)
     {
@@ -154,10 +143,10 @@ class FileMap extends Store
             end:
             restore_error_handler ();
             return $data ;
-        }catch (Exception $e)
+        }catch (Throwable $e)
         {
             restore_error_handler ();
-            throw $e;
+            throw new IpcException($e->getMessage (), 0, $e);
         }
     }
 
@@ -165,7 +154,7 @@ class FileMap extends Store
      * 删除数据
      * @param $key
      * @return bool|mixed|string
-     * @throws Exception
+     * @throws IpcException
      */
     public function unset ($key = true)
     {
@@ -173,7 +162,6 @@ class FileMap extends Store
             set_error_handler ( [ $this , 'errHandle' ] , E_ALL );
             $key = explode ( '.' , trim ( $key , '.' ) );
             $res = false;
-
             if ( !$key ) {
                 goto end;
             }
@@ -207,66 +195,61 @@ class FileMap extends Store
                 }
             }
             $res = $this -> write ( $data );
-            if ( $res ) {
-                throw new Exception($res);
-            }
             unlock:
             $this -> unlock ();
             end:
             restore_error_handler ();
             return $res;
         }
-        catch ( Exception $e ) {
+        catch (Throwable $e ) {
             $this -> unlock ();
             restore_error_handler ();
-            throw $e;
+            throw new IpcException($e->getMessage (), 0, $e);
         }
     }
 
     /**
      * 写入数据
      * @param $data
-     * @return bool|int|string
+     * @return bool
+     * @throws IpcException
      */
     protected function write($data)
     {
         ftruncate($this->lock_file_handle, 0);
         rewind($this->lock_file_handle);
-        $data = $this->options->serialize_handle->serialize($data);
+        $data = $this->options->serialize->encode($data);
         $len = strlen($data);
         //检测空间容量
         $need_space = $len - disk_free_space($this->options->after_format_path);
         if($need_space > 0)
         {
-            $data = "磁盘空间不足，还需：{$need_space} Bytes";
-            goto end ;
+            throw new IpcException("磁盘空间不足，还需：{$need_space} Bytes");
         }
         $data =  fwrite($this->lock_file_handle, $data) ;
         if($data===false)
         {
-            $data = '写入数据时发生错误' ;
-            goto end ;
+            throw new IpcException( '写入数据时发生错误');
         }
         fflush($this->lock_file_handle);
-        $data = false;
-        end:
-        return $data ;
+        return (bool)$data;
     }
 
     /**
      * 读取数据
-     * @return array
-     * @throws Exception
+     * @return array|bool
      * @throws IpcException
      */
     protected function read()
     {
         if(!rewind($this->lock_file_handle)) throw new IpcException('读取数据异常');
         $data = stream_get_contents ( $this->lock_file_handle);
-        $data = trim($data);
-        $data = $this->options->serialize_handle->unSerialize($data);
-        if(empty($data)) $data = [] ;
-        return (array)$data ;
+        $data = $this->options->serialize->decode($data);
+        if($data!==false)
+        {
+            $data  = (array)$data ;
+        }
+        return $data;
     }
 
     /**
@@ -290,7 +273,7 @@ class FileMap extends Store
 
     /**
      *
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     protected function init()
     {

@@ -14,7 +14,6 @@
 // +----------------------------------------------------------------------
 namespace phpth\ipc\supply;
 
-use phpth\ipc\exception\ExecutableException;
 use phpth\ipc\exception\IpcException;
 
 abstract class Store
@@ -23,7 +22,7 @@ abstract class Store
 
     /**
      *
-     * @var \phpth\ipc\supply\Options
+     * @var Options
      */
     public $options;
 
@@ -35,9 +34,8 @@ abstract class Store
     /**
      *
      * Store constructor.
-     * @param \phpth\ipc\supply\Options $options
-     * @throws \phpth\ipc\exception\ExecutableException
-     * @throws \phpth\ipc\exception\IpcException
+     * @param Options $options
+     * @throws IpcException
      */
     public function __construct(Options $options)
     {
@@ -48,14 +46,13 @@ abstract class Store
 
     /**
      * 初始化文件和句柄
-     * @throws ExecutableException
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     private function initFiles()
     {
-        if(!$this->options->serialize_handle instanceof Serialize)
+        if(!$this->options->serialize instanceof Serialize)
         {
-            throw new ExecutableException("请设置序列化对象");
+            throw new IpcException("请设置序列化对象");
         }
         if(empty($this->options->file_path))
         {
@@ -96,7 +93,7 @@ abstract class Store
     /**
      *
      * @return mixed
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     protected abstract function init();
 

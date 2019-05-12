@@ -34,7 +34,7 @@ trait ComTrait
      * @param  int $errline
      * @param  array $errcontext
      * @return null
-     * @throws \phpth\ipc\exception\IpcErrorException
+     * @throws IpcErrorException
      */
     public function errHandle($errno, $errstr, $errfile, $errline, $errcontext = null)
     {

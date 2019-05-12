@@ -14,41 +14,30 @@
 // +----------------------------------------------------------------------
 namespace phpth\ipc\Supply;
 
-use phpth\ipc\exception\ExecutableException;
-
 class Serialize
 {
     /**
      * 反序列化
      * @var mixed
      */
-    protected $un_serialize;
+    protected $decode;
 
     /**
      * 序列化
      * @var mixed
      */
-    protected $serialize;
+    protected $encode;
 
     /**
      *
      * Serialize constructor.
-     * @param $serialize
-     * @param $un_serialize
-     * @throws \phpth\ipc\exception\ExecutableException
+     * @param $encode
+     * @param $decode
      */
-    public function __construct ($serialize, $un_serialize)
+    public function __construct (callable $encode, callable $decode)
     {
-        if(!is_callable ($serialize))
-        {
-            throw new ExecutableException(var_export ($serialize, true)." 无法执行！");
-        }
-        if(!is_callable ($un_serialize))
-        {
-            throw new ExecutableException(var_export ($un_serialize, true)." 无法执行！");
-        }
-        $this->serialize = $serialize;
-        $this->un_serialize = $un_serialize;
+        $this->encode = $encode;
+        $this->decode = $decode;
     }
 
     /**
@@ -56,9 +45,9 @@ class Serialize
      * @param mixed ...$data
      * @return mixed
      */
-    public function serialize(...$data)
+    public function encode(...$data)
     {
-        return ($this->serialize)(...$data);
+        return ($this->encode)(...$data);
     }
 
     /**
@@ -66,8 +55,8 @@ class Serialize
      * @param mixed ...$data
      * @return mixed
      */
-    public function unSerialize(...$data)
+    public function decode(...$data)
     {
-        return ($this->un_serialize)(...$data);
+        return ($this->decode)(...$data);
     }
 }

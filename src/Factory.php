@@ -19,6 +19,7 @@ use phpth\ipc\supply\Options;
 use phpth\ipc\supply\Queue;
 use phpth\ipc\supply\ShmopMemory;
 use phpth\ipc\supply\Store;
+use phpth\ipc\supply\FileMap;
 use phpth\ipc\supply\sysVShmMemory;
 
 /**
@@ -44,7 +45,7 @@ class Factory
 
     /**
      * 设置对象
-     * @var \phpth\ipc\supply\options
+     * @var options
      */
     public $options;
 
@@ -52,7 +53,6 @@ class Factory
      *
      * Factory constructor.
      * @param Options|null $options
-     * @throws exception\ExecutableException
      */
     public function __construct (?Options $options)
     {
@@ -62,8 +62,8 @@ class Factory
     /**
      * 获取sysv队列操作对象
      * @param string $key
-     * @return \phpth\ipc\supply\Queue
-     * @throws \phpth\ipc\exception\IpcException
+     * @return Queue
+     * @throws IpcException
      */
     public function getQueue(string $key):Queue
     {
@@ -74,7 +74,6 @@ class Factory
      * 获取内存映射文件操作类
      * @return FileMap
      * @throws IpcException
-     * @throws exception\ExecutableException
      */
     public function getFileMap():FileMap
     {
@@ -89,7 +88,6 @@ class Factory
      * 获取shmop共享内存操作对象
      * @return ShmopMemory
      * @throws IpcException
-     * @throws exception\ExecutableException
      */
     public function getShmopMemory():ShmopMemory
     {
@@ -114,10 +112,9 @@ class Factory
     }
 
     /**
-     * 获取
-     * @return SysVShmMemory
+     * 获取sysv 共享内存操作对象
+     * @return sysVShmMemory
      * @throws IpcException
-     * @throws exception\ExecutableException
      */
     public function getSysVShmMemory():SysVShmMemory
     {
@@ -152,7 +149,7 @@ class Factory
 
     /**
      * 使用数组参数设置队列
-     * @param \phpth\ipc\supply\Options $options
+     * @param Options $options
      * @return array
      */
     public static function setByOption(Options $options):array
@@ -178,11 +175,11 @@ class Factory
     }
 
     /**
-     * 设置队列大小， 某些情况可能需要root权限才能生效
-     * @param int $size
-     * @return \phpth\ipc\Factory
+     * 设置队列或者共享内存大小， 某些情况可能需要root权限才能生效
+     * @param float $size
+     * @return Factory
      */
-    public function setSizeMb(int $size):self
+    public function setSizeMb(float $size):self
     {
         $this->options->memory_size  = $size*1024*1024;
         return $this;
@@ -192,7 +189,7 @@ class Factory
      * 设置队列的参数
      * @param $queue
      * @param $options
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     public static function queueOptionSetting($queue, $options):void
     {
@@ -206,7 +203,7 @@ class Factory
      * 获取一个Linux queue
      * @param string $key
      * @return resource
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     protected function queue(string $key)
     {

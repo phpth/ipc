@@ -39,7 +39,7 @@ class Options
      * 最大使用内存
      * @var float|int
      */
-    public $memory_size = 200*100*100;
+    public $memory_size = 2000*100*100;
 
     /**
      * 发生错误是否抛出异常
@@ -56,7 +56,7 @@ class Options
     public $file;
 
     /**
-     *
+     * 格式话之后的文件的全路径目录
      * @var string
      */
     public $after_format_path = '';
@@ -81,9 +81,9 @@ class Options
 
     /**
      *
-     * @var \phpth\ipc\Supply\Serialize
+     * @var Serialize
      */
-    public $serialize_handle;
+    public $serialize;
 
     /**
      * 共享内存资源标量
@@ -113,13 +113,13 @@ class Options
      * 入列和出列在队列满或者为空是否阻塞
      * @var bool
      */
-    public $block = true;
+    public $block = false;
 
     /**
      * 是否自动序列化
      * @var bool
      */
-    public $serialize = true;
+    public $auto_serialize = true;
 
     /**
      * 每个消息的最大大小
@@ -130,12 +130,11 @@ class Options
     /**
      *
      * Options constructor.
-     * @param mixed $serialize
-     * @param mixed $un_serialize
-     * @throws \phpth\ipc\exception\ExecutableException
+     * @param mixed $encode
+     * @param mixed $decode
      */
-    public function __construct ($serialize = 'json_encode', $un_serialize = 'json_decode')
+    public function __construct ($encode = 'json_encode', $decode = 'json_decode')
     {
-        $this->serialize_handle = new Serialize( $serialize, $un_serialize);
+        $this->serialize = new Serialize( $encode, $decode);
     }
 }

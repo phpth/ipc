@@ -39,7 +39,7 @@ class Queue
 
     /**
      *
-     * @var \phpth\ipc\supply\Options
+     * @var Options
      */
     public $options;
 
@@ -47,7 +47,7 @@ class Queue
      *
      * Queue constructor.
      * @param $queue
-     * @param \phpth\ipc\supply\Options $options
+     * @param Options $options
      */
     public function __construct ($queue, Options $options)
     {
@@ -59,7 +59,7 @@ class Queue
      * 入列
      * @param $message
      * @return bool
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     public function push ($message):bool
     {
@@ -77,7 +77,7 @@ class Queue
                 goto end;
             }
         }
-        $res = msg_send ( $this -> queue , Queue::IPC_MSG_TYPE, $message , $this->options->serialize, $this->options->block, $error_code );
+        $res = msg_send ( $this -> queue , Queue::IPC_MSG_TYPE, $message , $this->options->auto_serialize, $this->options->block, $error_code );
         if($error_code || !$res)
         {
             $this->error_msg = "队列push异常，push_res：".var_export ($res, true)."，error_code: {$error_code}，error_msg: ".LinuxCode::getMsgByCode ($error_code);
@@ -97,7 +97,7 @@ class Queue
     /**
      * 出列
      * @return mixed
-     * @throws \phpth\ipc\exception\IpcException
+     * @throws IpcException
      */
     public function pop ()
     {
@@ -110,7 +110,7 @@ class Queue
         {
             $flags = MSG_IPC_NOWAIT;
         }
-        $res = msg_receive ($this -> queue , 0, $msgtype , $this->options->msg_body_size, $message, $this->options->serialize, $flags, $error_code);
+        $res = msg_receive ($this -> queue , 0, $msgtype , $this->options->msg_body_size, $message, $this->options->auto_serialize, $flags, $error_code);
         if(!$res || $error_code)
         {
             $this->error_msg = "队列pop异常，pop_res：".var_export ($res, true)."，error_code：{$error_code}，error_msg：".LinuxCode::getMsgByCode ($error_code);

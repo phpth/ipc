@@ -17,18 +17,8 @@ namespace phpth\test;
 use phpth\ipc\Factory;
 use phpth\ipc\supply\Options;
 
-require '../src/exception/ExecutableException.php';
-require '../src/exception/IpcErrorException.php';
-require '../src/exception/IpcException.php';
-require '../src/supply/ComTrait.php';
-require '../src/supply/Store.php';
-require '../src/supply/FileMap.php';
-require '../src/supply/Serialize.php';
-require '../src/supply/ShmopMemory.php';
-require '../src/supply/SysVShmMemory.php';
-require '../src/supply/Options.php';
-require '../src/supply/Queue.php';
-require '../src/Factory.php';
+require '../src/autoload.php';
+
 
 try{
 
